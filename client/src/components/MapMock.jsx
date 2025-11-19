@@ -1,14 +1,60 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import assets from "../assets/assets";
+import SosAlert from "./SosAlert";
 
 const MapMock = ({ selectedTitle, selectedImg }) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+
+  // 👉 Function called when "Send Alert" is clicked
+  const handleSendAlert = () => {
+    // // Close popup
+    setTimeout(()=>{
+       setShowAlert(false);
+    },2000)
+
+    // You can add toast or something later if needed
+    console.log("Alert sent successfully!");
+  };
+
+  // 👉 Fetch real GPS location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => {
+          setUserLocation({
+            lat: 28.6139,
+            lng: 77.2090,
+          });
+        }
+      );
+    }
+  }, []);
+
   return (
-    <div className="
+    <div
+      className="
       w-full 
       h-[450px] sm:h-[550px] lg:h-[650px] 
       rounded-2xl border border-gray-700 
       bg-[#111] relative overflow-hidden
-    ">
+    "
+    >
+      {/* 🔥 SOS POPUP OVERLAY */}
+      {showAlert && (
+        <SosAlert
+          onClose={() => setShowAlert(false)}
+          onSend={handleSendAlert}
+          location={userLocation}
+        />
+      )}
+
       {/* Top Badge */}
       <div className="absolute top-4 left-4 bg-[#1a1a1a] border border-gray-700 px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-2">
         <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
@@ -47,6 +93,9 @@ const MapMock = ({ selectedTitle, selectedImg }) => {
       {/* ALERT BUTTON */}
       <div className="absolute bottom-4 right-4">
         <div
+          onClick={() => {
+            setShowAlert(true);
+          }}
           className="
             relative 
             w-14 h-14 sm:w-20 sm:h-20 
