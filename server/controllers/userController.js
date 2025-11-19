@@ -73,7 +73,7 @@ const sendSOS = async (req, res) => {
         }
 
         // fetch the user details
-        const user = await User.findById({clerkId});
+        const user = await User.findOne({clerkId});
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });

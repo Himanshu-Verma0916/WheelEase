@@ -1,8 +1,12 @@
 import React from "react";
 import logo from "../assets/logo.png";
-import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { Link, useNavigate } from 'react-router-dom';
+import { SignInButton, UserButton, SignedIn, SignedOut, useClerk,useUser} from "@clerk/clerk-react";
 
 const Navbar = () => {
+  const {openSignIn} =useClerk();
+  const {isSignedIn , user} =useUser();
+  const navigate = useNavigate();
   return (
     <nav className="w-full bg-[#0F0F0F] border-b border-gray-700 px-6 sm:px-10 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
