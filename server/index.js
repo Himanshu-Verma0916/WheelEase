@@ -11,13 +11,12 @@ dbConnect();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());
-
-
 app.get('/', (req, res) => {
     res.send('Server is working perfectly');
 });
 app.use('/api/user', userRouter);
+
+app.use(express.json());
 
 // Listen only when running locally
 if (process.env.NODE_ENV !== "production") {
