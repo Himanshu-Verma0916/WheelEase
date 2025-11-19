@@ -1,7 +1,9 @@
 // we put user data when user sign up or login using clerk
 // with help of clerkweb hooks
-const { Webhook } = require('svix');
+const { Webhook} = require('svix');
 const User = require('../models/userModel');
+require('dotenv').config();
+
 
 const clerkWebHooks = async (req, res) => {
     try {
@@ -60,5 +62,3 @@ const clerkWebHooks = async (req, res) => {
 }
 
 module.exports ={clerkWebHooks};
-
-
