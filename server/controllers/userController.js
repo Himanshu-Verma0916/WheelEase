@@ -64,7 +64,7 @@ const clerkWebHooks = async (req, res) => {
 //  controller function for sending sos alert
 const sendSOS = async (req, res) => {
     try {
-        const { clerkId} = req.user.clerkId;
+        const clerkId = req.user.clerkId;
 
         const {message} =req.body;
 
@@ -73,7 +73,7 @@ const sendSOS = async (req, res) => {
         }
 
         // fetch the user details
-        const user = await User.findById(clerkId);
+        const user = await User.findById({clerkId});
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
