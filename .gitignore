@@ -34,4 +34,8 @@ Thumbs.db
 .idea/
 
 # Misc
+<<<<<<< HEAD
 *.local
+=======
+*.local
+>>>>>>> 2f08537 (updating commit)

@@ -7,4 +7,5 @@ const connectDb = async()=>{
     mongoose.connect(`${process.env.MONGO_URI}/NavigationApp`)
 }
 
+
 module.exports = connectDb;

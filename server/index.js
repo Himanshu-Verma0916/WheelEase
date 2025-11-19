@@ -11,8 +11,13 @@ dbConnect();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
+<<<<<<< HEAD
 app.use('/api/user', userRouter);
 
+=======
+
+app.use('/api/user', userRouter);
+>>>>>>> 2f08537 (updating commit)
 app.use(express.json());
 
 app.get('/', (req, res) => {
