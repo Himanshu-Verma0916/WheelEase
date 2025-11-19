@@ -15,6 +15,7 @@ const SuccessSosPopup = ({ onClose }) => {
             </p>
           </div>
           <button onClick={onClose} className="text-white text-2xl">
+            {/* comment  */}
             <IoClose />
           </button>
         </div>
