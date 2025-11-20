@@ -1,46 +1,37 @@
-import React, { createContext, useEffect, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
-import axios from "axios";
+import { createContext } from "react";
+import { useAuth } from "@clerk/clerk-react";
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const { isSignedIn, user } = useUser(); // no getToken needed
-  const [currentUser, setCurrentUser] = useState(null);
+  const { getToken } = useAuth();
 
-  const syncUserToBackend = async () => {
-    if (isSignedIn && user) {
-      try {
-        const payload = {
-          data: {
-            id: user.id,
-            email_addresses: [{ email_address: user.emailAddresses?.[0]?.emailAddress }],
-            first_name: user.firstName,
-            last_name: user.lastName,
-            image_url: user.profileImageUrl,
-          },
-          type: "user.created", // mimic webhook event
-        };
+  const sendSOS = async () => {
+    try {
+      const token = await getToken();
 
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/user/webhooks`,
-          payload
-        );
-
-        setCurrentUser(payload.data);
-        console.log("✅ User synced to backend!");
-      } catch (err) {
-        console.log("❌ Error syncing user:", err.response?.data || err.message);
+      if (!token) {
+        console.error("No token found from Clerk");
+        return;
       }
+
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/sos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("SOS Response:", data);
+    } catch (error) {
+      console.error("Error sending SOS:", error);
     }
   };
 
-  useEffect(() => {
-    syncUserToBackend(); // sync automatically when user logs in
-  }, [isSignedIn, user]);
-
   return (
-    <AppContext.Provider value={{ currentUser, syncUserToBackend }}>
+    <AppContext.Provider value={{ sendSOS }}>
       {children}
     </AppContext.Provider>
   );

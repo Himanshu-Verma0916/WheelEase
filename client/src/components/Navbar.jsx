@@ -1,14 +1,16 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import logo from "../assets/logo.png";
-import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { SignInButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from "@clerk/clerk-react";
 import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
-  const { syncUserToBackend } = useContext(AppContext);
+  const { credit, loadCreditData } = useContext(AppContext);
+  const { isSignedIn, user } = useUser();
+  const { openSignIn } = useClerk();
 
   useEffect(() => {
-    syncUserToBackend(); // sync when Navbar mounts
-  }, []);
+    if (isSignedIn) loadCreditData(); // fetch credits from backend
+  }, [isSignedIn]);
 
   return (
     <nav className="w-full bg-[#0F0F0F] border-b border-gray-700 px-6 sm:px-10 py-4 sticky top-0 z-50">
@@ -19,9 +21,7 @@ const Navbar = () => {
             <h1 className="text-white font-semibold text-lg sm:text-xl leading-tight">
               Wheelchair Guidance & Assistance
             </h1>
-            <p className="text-gray-500 text-xs sm:text-sm">
-              Navigate with confidence and independence
-            </p>
+            <p className="text-gray-500 text-xs sm:text-sm">Navigate with confidence and independence</p>
           </div>
         </div>
 
@@ -29,10 +29,7 @@ const Navbar = () => {
           <SignedOut>
             <SignInButton
               appearance={{
-                elements: {
-                  button:
-                    "bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm shadow transition",
-                },
+                elements: { button: "bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm shadow transition" }
               }}
             />
           </SignedOut>
@@ -40,12 +37,11 @@ const Navbar = () => {
           <SignedIn>
             <UserButton
               appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10 hover:scale-105 transition-all",
-                },
+                elements: { avatarBox: "w-10 h-10 hover:scale-105 transition-all" }
               }}
-              onClick={syncUserToBackend} // optional manual sync
             />
+            <span className="text-white ml-2 max-sm:hidden">{user.fullName}</span>
+            <span className="text-gray-400 ml-4">Credits: {credit ?? 0}</span>
           </SignedIn>
         </div>
       </div>
