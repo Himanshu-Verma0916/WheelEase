@@ -1,10 +1,8 @@
 import React, { useEffect, useContext } from "react";
 import logo from "../assets/logo.png";
 import { SignInButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from "@clerk/clerk-react";
-import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
-  const { credit, loadCreditData } = useContext(AppContext);
   const { isSignedIn, user } = useUser();
   const { openSignIn } = useClerk();
 
