@@ -8,10 +8,6 @@ const Navbar = () => {
   const { isSignedIn, user } = useUser();
   const { openSignIn } = useClerk();
 
-  useEffect(() => {
-    if (isSignedIn) loadCreditData(); // fetch credits from backend
-  }, [isSignedIn]);
-
   return (
     <nav className="w-full bg-[#0F0F0F] border-b border-gray-700 px-6 sm:px-10 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -40,8 +36,6 @@ const Navbar = () => {
                 elements: { avatarBox: "w-10 h-10 hover:scale-105 transition-all" }
               }}
             />
-            <span className="text-white ml-2 max-sm:hidden">{user.fullName}</span>
-            <span className="text-gray-400 ml-4">Credits: {credit ?? 0}</span>
           </SignedIn>
         </div>
       </div>
