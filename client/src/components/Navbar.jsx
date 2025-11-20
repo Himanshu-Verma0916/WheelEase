@@ -4,7 +4,7 @@ import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/clerk-reac
 import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
-  const { syncUserToBackend } = useContext(AppContext); // ✅ Just AppContext
+  const { syncUserToBackend } = useContext(AppContext);
 
   useEffect(() => {
     syncUserToBackend(); // sync when Navbar mounts
@@ -44,7 +44,7 @@ const Navbar = () => {
                   avatarBox: "w-10 h-10 hover:scale-105 transition-all",
                 },
               }}
-              onClick={syncUserToBackend} // manual sync optional
+              onClick={syncUserToBackend} // optional manual sync
             />
           </SignedIn>
         </div>

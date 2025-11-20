@@ -2,19 +2,15 @@ import React, { createContext, useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 
-// Create context
 export const AppContext = createContext();
 
-// Provider
 export const AppProvider = ({ children }) => {
-  const { isSignedIn, user, getToken } = useUser();
+  const { isSignedIn, user } = useUser(); // no getToken needed
   const [currentUser, setCurrentUser] = useState(null);
 
   const syncUserToBackend = async () => {
     if (isSignedIn && user) {
       try {
-        const token = await getToken({ template: "default" });
-
         const payload = {
           data: {
             id: user.id,
@@ -23,13 +19,12 @@ export const AppProvider = ({ children }) => {
             last_name: user.lastName,
             image_url: user.profileImageUrl,
           },
-          type: "user.created",
+          type: "user.created", // mimic webhook event
         };
 
         await axios.post(
           `${process.env.REACT_APP_API_URL}/api/user/webhooks`,
-          payload,
-          { headers: { token } }
+          payload
         );
 
         setCurrentUser(payload.data);
@@ -41,7 +36,7 @@ export const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    syncUserToBackend();
+    syncUserToBackend(); // sync automatically when user logs in
   }, [isSignedIn, user]);
 
   return (
