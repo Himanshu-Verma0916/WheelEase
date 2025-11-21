@@ -1,6 +1,6 @@
 // we put user data when user sign up or login using clerk
 // with help of clerkweb hooks
-const { Webhook} = require('svix');
+const { Webhook } = require('svix');
 const User = require('../models/userModel');
 require('dotenv').config();
 const axios = require('axios');
@@ -92,69 +92,103 @@ const clerkWebHooks = async (req, res) => {
 //     }
 // };
 
+// const sendSOS = async (req, res) => {
+//   try {
+//     const clerkId = req.user.clerkId;
+//     const { message, location } = req.body;
+
+//     if (!clerkId) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
+
+//     // WhatsApp API variables
+//     const waPhoneId = process.env.META_WA_PHONE_NUMBER_ID;
+//     const waToken = process.env.META_WA_ACCESS_TOKEN;
+
+//     const url = `https://graph.facebook.com/v22.0/${waPhoneId}/messages`;
+
+//     const body = {
+//       messaging_product: "whatsapp",
+//       to: process.env.ADMIN_PHONE, // your real number with country code
+//       type: "text",
+//       text: {
+//         body: `🚨 SOS ALERT 🚨\nMessage: ${message}\nLocation: Lat ${location.lat}, Lng ${location.lng}`
+//       }
+//     };
+
+//     const response = await fetch(url, {
+//       method: "POST",
+//       headers: {
+//         "Authorization": `Bearer ${waToken}`,  // <<< IMPORTANT
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify(body)
+//     });
+
+//     const data = await response.json();
+//     console.log("WHO SENT TO META:", data);
+
+//     if (data.error) {
+//       return res.json({ success: false, error: data.error });
+//     }
+
+//     res.json({ success: true, message: "SOS sent successfully!" });
+
+//   } catch (error) {
+//     console.error("SOS backend error:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 const sendSOS = async (req, res) => {
-    try {
-        const clerkId = req.user.clerkId;
-        const { message, lat, lng } = req.body;
+  try {
+    const clerkId = req.user.clerkId;
 
-        if (!clerkId) {
-            return res.status(400).json({ error: "User ID required" });
-        }
+    const user = await User.findOne({ clerkId });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-        // fetch the user details
-        const user = await User.findOne({ clerkId });
+    const { message, name, location } = req.body;
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        console.log("🚨 SOS Triggered by:", user.email);
-
-        // -----------------------------
-        //  WHATSAPP CLOUD API MESSAGE
-        // -----------------------------
-        const fullMessage = 
-`🚨 *SOS ALERT* 🚨
-
-User: ${user.firstName || "Unknown"} ${user.lastName || ""}
-Email: ${user.email}
+    const textMessage = `
+🚨 *EMERGENCY SOS ALERT* 🚨
+Name: ${name}
 Message: ${message}
 
-Location:
-https://www.google.com/maps?q=${lat},${lng}
+📍 *Location*
+Latitude: ${location.lat}
+Longitude: ${location.lng}
 
-Please respond immediately!`;
+Please respond immediately!
+    `;
 
-        await axios.post(
-            `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
-            {
-                messaging_product: "whatsapp",
-                to: process.env.SOS_RECEIVER_NUMBER,
-                type: "text",
-                text: { body: fullMessage }
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+    const whatsappURL = `https://graph.facebook.com/v22.0/${process.env.META_WA_PHONE_NUMBER_ID}/messages`;
 
-        res.status(200).json({
-            success: true,
-            message: "🚨 SOS sent via WhatsApp successfully!"
-        });
+    const response = await fetch(whatsappURL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.META_WA_ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: process.env.ADMIN_PHONE,
+        type: "text",
+        text: {
+          body: textMessage
+        }
+      })
+    });
 
-    } catch (error) {
-        console.log("WhatsApp SOS Error:", error.response?.data || error.message);
+    const data = await response.json();
+    console.log("WHATSAPP API RESPONSE:", data);
 
-        res.status(500).json({
-            success: false,
-            message: "Failed to send SOS",
-            error: error.response?.data || error.message
-        });
-    }
+    res.json({ success: true, message: "SOS sent successfully", data });
+
+  } catch (error) {
+    console.log("SOS ERROR:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-module.exports ={clerkWebHooks,sendSOS };
+
+module.exports = { clerkWebHooks, sendSOS };

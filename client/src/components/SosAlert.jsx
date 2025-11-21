@@ -1,51 +1,58 @@
+import { toast } from "react-toastify";
 import React, { useState } from "react";
 import { IoClose, IoLocationSharp } from "react-icons/io5";
 import { FaPhoneAlt } from "react-icons/fa";
 import SuccessSosPopup from "./SuccessSosPopup";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
-const SosAlert = ({ onClose,onSend, location }) => {
+const SosAlert = ({ onClose, onSend, location }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const { getToken, isSignedIn } = useAuth();
+  const { user } = useUser();
 
   const handleSend = async () => {
-  try {
-    const token = await user.getToken(); // Clerk JWT
+    try {
+      if (!isSignedIn) {
+        toast.error("Please sign in to send SOS.");
+        return;
+      }
 
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/sos`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        message: "Emergency! User triggered SOS alert.",
-        location: location,
-      }),
-    });
+      const token = await getToken();
 
-    const data = await res.json();
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/sos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify({
+          message: "🚨 Emergency SOS activated!",
+          name: user.fullName,
+          location,
+        }),
+      });
 
-    if (data.success) {
-      setShowSuccess(true);
-      onSend?.(); 
-    } else {
-      toast.error(data.error || "Failed to send SOS");
+      const data = await res.json();
+
+      if (data.success) {
+        setShowSuccess(true);
+        onSend?.();
+      } else {
+        toast.error(data.error || "Failed to send SOS.");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("SOS failed.");
     }
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to send SOS alert.");
-  }
-};
-
+  };
 
   return (
     <>
-      {/* MAIN SOS POPUP */}
       {!showSuccess && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-y-auto p-4">
           <div className="bg-white w-full max-w-lg rounded-xl shadow-lg overflow-hidden">
 
-            {/* Header */}
             <div className="bg-red-600 text-white px-5 py-4 flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-semibold">Emergency SOS</h2>
@@ -58,12 +65,10 @@ const SosAlert = ({ onClose,onSend, location }) => {
               </button>
             </div>
 
-            {/* Info */}
             <div className="bg-yellow-50 border border-yellow-200 mx-5 mt-5 p-4 rounded-lg text-sm text-gray-700">
               Your emergency alert will be sent with your current location.
             </div>
 
-            {/* Location */}
             <div className="mx-5 mt-4 p-4 rounded-xl bg-gray-100 flex gap-3 items-start">
               <IoLocationSharp className="text-blue-500 text-2xl" />
               <div>
@@ -74,28 +79,25 @@ const SosAlert = ({ onClose,onSend, location }) => {
               </div>
             </div>
 
-            {/* Contacts */}
             <p className="mx-5 mt-5 mb-2 text-gray-700 font-semibold">
               Alert will be sent to:
             </p>
 
-            {[
-              {
-                name: "Central Police Station",
-                phone: "+254-20-9999999",
-                icon: "👮‍♂️",
-              },
-              {
-                name: "Disability Rights NGO",
-                phone: "+254-20-5555555",
-                icon: "🤝",
-              },
-              {
-                name: "Community Support Center",
-                phone: "+254-20-4444444",
-                icon: "🤝",
-              },
-            ].map((c, i) => (
+            {[{
+              name: "Central Police Station",
+              phone: "+254-20-9999999",
+              icon: "👮‍♂️",
+            },
+            {
+              name: "Disability Rights NGO",
+              phone: "+254-20-5555555",
+              icon: "🤝",
+            },
+            {
+              name: "Community Support Center",
+              phone: "+254-20-4444444",
+              icon: "🤝",
+            }].map((c, i) => (
               <div
                 key={i}
                 className="mx-5 mt-3 p-4 rounded-xl border bg-gray-50 flex items-center gap-3"
@@ -110,24 +112,21 @@ const SosAlert = ({ onClose,onSend, location }) => {
               </div>
             ))}
 
-            {/* Send Button */}
             <button
               onClick={handleSend}
               className="w-full bg-red-600 text-white py-4 mt-6 text-lg font-semibold hover:bg-red-700 transition"
             >
               🚨 Send Emergency Alert
             </button>
-
           </div>
         </div>
       )}
 
-      {/* SUCCESS POPUP */}
       {showSuccess && (
         <SuccessSosPopup
           onClose={() => {
             setShowSuccess(false);
-            onClose(); // closes main popup also
+            onClose();
           }}
         />
       )}
