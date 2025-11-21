@@ -4,6 +4,7 @@ import MapMock from "./components/MapMock";
 import ServiceCard from "./components/ServiceCard";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import { ToastContainer, toast } from 'react-toastify';
 
 const App = () => {
   const [selectedService, setSelectedService] = useState("Stair-Free Paths");
@@ -17,72 +18,100 @@ const App = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0F0F0F] text-white px-4 sm:px-6 py-6">
+    <div className="min-h-screen flex flex-col bg-[#0F0F0F] text-white">
+      <ToastContainer/>
 
       {/* NAVBAR */}
-      <Navbar />
+      <div className="px-4 sm:px-6 py-6">
+        <Navbar />
 
-      {/* MAIN CONTENT GRID */}
-      <div className="
-        max-w-[1600px] mx-auto mt-8 
-        grid grid-cols-1 lg:grid-cols-[380px_1fr] 
-        gap-6 transition-all duration-500
-      ">
+        {/* MAIN CONTENT GRID */}
+        <div
+          className="
+            max-w-[1600px] mx-auto mt-8 
+            grid grid-cols-1 lg:grid-cols-[380px_1fr] 
+            gap-6 transition-all duration-500
+          "
+        >
+          {/* LEFT — SERVICE CARDS */}
+          <div
+            className="
+              grid 
+              grid-cols-1 sm:grid-cols-2 
+              gap-4
+            "
+          >
+            <ServiceCard
+              title="Accessible Toilets"
+              img={assets.toilet}
+              selected={selectedService === "Accessible Toilets"}
+              onClick={() =>
+                handleSelection("Accessible Toilets", assets.toilet)
+              }
+            />
 
-        {/* LEFT — SERVICE CARDS */}
-        <div className="
-          grid 
-          grid-cols-1 sm:grid-cols-2 
-          gap-4
-        ">
-          <ServiceCard title="Accessible Toilets" img={assets.toilet}
-            selected={selectedService === "Accessible Toilets"}
-            onClick={() => handleSelection("Accessible Toilets", assets.toilet)}
-          />
+            <ServiceCard
+              title="Hospitals & Clinics"
+              img={assets.medical}
+              selected={selectedService === "Hospitals & Clinics"}
+              onClick={() =>
+                handleSelection("Hospitals & Clinics", assets.medical)
+              }
+            />
 
-          <ServiceCard title="Hospitals & Clinics" img={assets.medical}
-            selected={selectedService === "Hospitals & Clinics"}
-            onClick={() =>
-              handleSelection("Hospitals & Clinics", assets.medical)
-            }
-          />
+            <ServiceCard
+              title="Repair Shops"
+              img={assets.repairShop}
+              selected={selectedService === "Repair Shops"}
+              onClick={() =>
+                handleSelection("Repair Shops", assets.repairShop)
+              }
+            />
 
-          <ServiceCard title="Repair Shops" img={assets.repairShop}
-            selected={selectedService === "Repair Shops"}
-            onClick={() => handleSelection("Repair Shops", assets.repairShop)}
-          />
+            <ServiceCard
+              title="Vendors & Shops"
+              img={assets.shops}
+              selected={selectedService === "Vendors & Shops"}
+              onClick={() =>
+                handleSelection("Vendors & Shops", assets.shops)
+              }
+            />
 
-          <ServiceCard title="Vendors & Shops" img={assets.shops}
-            selected={selectedService === "Vendors & Shops"}
-            onClick={() => handleSelection("Vendors & Shops", assets.shops)}
-          />
+            <ServiceCard
+              title="Police Stations"
+              img={assets.policeStation}
+              selected={selectedService === "Police Stations"}
+              onClick={() =>
+                handleSelection("Police Stations", assets.policeStation)
+              }
+            />
 
-          <ServiceCard title="Police Stations" img={assets.policeStation}
-            selected={selectedService === "Police Stations"}
-            onClick={() =>
-              handleSelection("Police Stations", assets.policeStation)
-            }
-          />
+            <ServiceCard
+              title="NGOs & Support"
+              img={assets.ngo}
+              selected={selectedService === "NGOs & Support"}
+              onClick={() =>
+                handleSelection("NGOs & Support", assets.ngo)
+              }
+            />
 
-          <ServiceCard title="NGOs & Support" img={assets.ngo}
-            selected={selectedService === "NGOs & Support"}
-            onClick={() => handleSelection("NGOs & Support", assets.ngo)}
-          />
+            <ServiceCard
+              title="Stair-Free Paths"
+              img={assets.stairFreePath}
+              selected={selectedService === "Stair-Free Paths"}
+              onClick={() =>
+                handleSelection("Stair-Free Paths", assets.stairFreePath)
+              }
+            />
+          </div>
 
-          <ServiceCard title="Stair-Free Paths" img={assets.stairFreePath}
-            selected={selectedService === "Stair-Free Paths"}
-            onClick={() =>
-              handleSelection("Stair-Free Paths", assets.stairFreePath)
-            }
-          />
+          {/* RIGHT — MAP */}
+          <MapMock selectedTitle={selectedTitle} selectedImg={selectedImg} />
         </div>
-
-        {/* RIGHT — MAP */}
-        <MapMock selectedTitle={selectedTitle} selectedImg={selectedImg} />
       </div>
 
+      {/* FOOTER FIX — no extra space */}
       <Footer />
-
     </div>
   );
 };

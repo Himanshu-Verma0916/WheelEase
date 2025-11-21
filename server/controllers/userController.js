@@ -3,7 +3,7 @@
 const { Webhook} = require('svix');
 const User = require('../models/userModel');
 require('dotenv').config();
-
+const axios = require('axios');
 
 const clerkWebHooks = async (req, res) => {
     try {
@@ -62,33 +62,98 @@ const clerkWebHooks = async (req, res) => {
 }
 
 //  controller function for sending sos alert
+// const sendSOS = async (req, res) => {
+//     try {
+//         const clerkId = req.user.clerkId;
+
+//         const {message} =req.body;
+
+//         if (!clerkId) {
+//             return res.status(400).json({ error: "User ID required" });
+//         }
+
+//         // fetch the user details
+//         const user = await User.findOne({clerkId});
+
+//         if (!user) {
+//             return res.status(404).json({ error: "User not found" });
+//         }
+
+//         // Example: store alert in DB (optional)
+//         // or send SMS / email  
+//         console.log("🚨 SOS Triggered by:", user.email);
+//         console.log("Message:", message);
+
+//         res.status(200).json({success: true, message: "SOS triggered successfully!"});
+
+//     } catch (error) {
+//         console.log("error sos",error.message);
+//         res.status(500).json({success :false , message: error.message});
+//     }
+// };
+
 const sendSOS = async (req, res) => {
     try {
         const clerkId = req.user.clerkId;
-
-        const {message} =req.body;
+        const { message, lat, lng } = req.body;
 
         if (!clerkId) {
             return res.status(400).json({ error: "User ID required" });
         }
 
         // fetch the user details
-        const user = await User.findOne({clerkId});
+        const user = await User.findOne({ clerkId });
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Example: store alert in DB (optional)
-        // or send SMS / email  
         console.log("🚨 SOS Triggered by:", user.email);
-        console.log("Message:", message);
 
-        res.status(200).json({success: true, message: "SOS triggered successfully!"});
+        // -----------------------------
+        //  WHATSAPP CLOUD API MESSAGE
+        // -----------------------------
+        const fullMessage = 
+`🚨 *SOS ALERT* 🚨
+
+User: ${user.firstName || "Unknown"} ${user.lastName || ""}
+Email: ${user.email}
+Message: ${message}
+
+Location:
+https://www.google.com/maps?q=${lat},${lng}
+
+Please respond immediately!`;
+
+        await axios.post(
+            `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
+            {
+                messaging_product: "whatsapp",
+                to: process.env.SOS_RECEIVER_NUMBER,
+                type: "text",
+                text: { body: fullMessage }
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "🚨 SOS sent via WhatsApp successfully!"
+        });
 
     } catch (error) {
-        console.log("error sos",error.message);
-        res.status(500).json({success :false , message: error.message});
+        console.log("WhatsApp SOS Error:", error.response?.data || error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to send SOS",
+            error: error.response?.data || error.message
+        });
     }
 };
 

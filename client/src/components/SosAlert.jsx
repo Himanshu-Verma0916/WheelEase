@@ -6,18 +6,37 @@ import SuccessSosPopup from "./SuccessSosPopup";
 const SosAlert = ({ onClose,onSend, location }) => {
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSend = () => {
-    // simulate API call
-    console.log("Sending alert...");
-    
-    // after success
-    setShowSuccess(true);
-    
-      // notify MapMock
-    if (onSend){
-      onSend();
-    } 
-  };
+  const handleSend = async () => {
+  try {
+    const token = await user.getToken(); // Clerk JWT
+
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/sos`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        message: "Emergency! User triggered SOS alert.",
+        location: location,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setShowSuccess(true);
+      onSend?.(); 
+    } else {
+      toast.error(data.error || "Failed to send SOS");
+    }
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to send SOS alert.");
+  }
+};
+
 
   return (
     <>

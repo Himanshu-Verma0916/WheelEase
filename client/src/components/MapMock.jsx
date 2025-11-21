@@ -1,41 +1,42 @@
 import React, { useState, useEffect } from "react";
 import assets from "../assets/assets";
 import SosAlert from "./SosAlert";
+import { useUser } from '@clerk/clerk-react';
+import { toast } from 'react-toastify';
+
 
 const MapMock = ({ selectedTitle, selectedImg }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+  const { isSignedIn, user } = useUser(); // 👉 Function called when "Send Alert" is clicked
 
   // 👉 Function called when "Send Alert" is clicked
   const handleSendAlert = () => {
     // // Close popup
-    setTimeout(()=>{
-       setShowAlert(false);
-    },2000)
+    // setTimeout(()=>{
+    //    setShowAlert(false);
+    // },2000)
 
     // You can add toast or something later if needed
     console.log("Alert sent successfully!");
   };
 
   // 👉 Fetch real GPS location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
+   useEffect(() => {
+      if (isSignedIn) {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude, });
           });
-        },
-        () => {
-          setUserLocation({
-            lat: 28.6139,
-            lng: 77.2090,
-          });
+        } else {
+          setUserLocation({ lat: null, lng: null });
         }
-      );
-    }
-  }, []);
+      }
+    }, [isSignedIn]);
+
+  useEffect(() => {
+    console.log("current user location is :", userLocation);
+  }, [userLocation, isSignedIn]);
 
   return (
     <div
