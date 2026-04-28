@@ -5,6 +5,12 @@ import { SignInButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from
 const Navbar = () => {
   const { isSignedIn, user } = useUser();
   const { openSignIn } = useClerk();
+  // useEffect(()=>{
+  //   if(isSignedIn){
+  //     console.log(user.id);
+  //   }
+    
+  // },[isSignedIn, user]);
 
   return (
     <nav className="w-full bg-[#0F0F0F] border-b border-gray-700 px-6 sm:px-10 py-4 sticky top-0 z-50">

@@ -7,6 +7,7 @@ import repairShop from "./repairShop.png";
 import shops from "./shops.png";
 import stairFreePath from "./stairFreePath.png";
 import toilet from "./toilet.png";
+import location from "./location.png";
 
 // Export as one object
 const assets = {
@@ -18,6 +19,7 @@ const assets = {
   shops,
   stairFreePath,
   toilet,
+  location,
 };
 
 export default assets;

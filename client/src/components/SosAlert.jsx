@@ -50,7 +50,7 @@ const SosAlert = ({ onClose, onSend, location }) => {
   return (
     <>
       {!showSuccess && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-y-auto p-4">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-y-auto p-4 z-[99999]">
           <div className="bg-white w-full max-w-lg rounded-xl shadow-lg overflow-hidden">
 
             <div className="bg-red-600 text-white px-5 py-4 flex justify-between items-center">

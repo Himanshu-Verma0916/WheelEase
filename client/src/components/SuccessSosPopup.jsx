@@ -3,7 +3,7 @@ import { IoClose } from "react-icons/io5";
 
 const SuccessSosPopup = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-50 px-4">
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-[99999] px-4">
       <div className="bg-white max-w-lg w-full rounded-xl shadow-lg overflow-hidden animate-fadeIn">
 
         {/* Header */}
